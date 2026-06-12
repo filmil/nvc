@@ -6,7 +6,10 @@ load("//bazel:bootstrap.bzl", "nvc_bootstrap")
 
 package(default_visibility = ["//visibility:public"])
 
-exports_files(["COPYING"])
+exports_files([
+    "COPYING",
+    "src/symbols.txt",
+])
 
 # ---------------------------------------------------------------------------
 # Generated sources
@@ -110,10 +113,13 @@ cc_library(
 cc_binary(
     name = "nvc",
     srcs = ["src/nvc.c"],
-    # -rdynamic exports the runtime support symbols so the JIT's foreign
-    # function interface can resolve them with dlsym at simulation time.
+    # Export exactly the runtime support symbols (the same dynamic symbol list
+    # the autotools build uses) so the JIT's foreign function interface can
+    # resolve them with dlsym, and no more.  Using the full -rdynamic instead
+    # would expose extra internal symbols and change constant-folding results.
+    additional_linker_inputs = ["src/symbols.txt"],
     linkopts = [
-        "-rdynamic",
+        "-Wl,--dynamic-list=$(location src/symbols.txt)",
         "-pthread",
         "-ldl",
         "-lm",
