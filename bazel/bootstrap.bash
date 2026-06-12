@@ -28,13 +28,19 @@ NVC="$1"; shift
 OUT="$1"; shift
 # Remaining arguments are the deps.mk files.
 
-SRC="$PWD"
+# The library .vhd sources live next to the deps.mk manifests.  When nvc is the
+# main repository these paths are "lib/<dir>/deps.mk"; when nvc is consumed as
+# an external repository (e.g. via the Bazel Central Registry) they are
+# "external/<repo>/lib/<dir>/deps.mk".  Derive the prefix up to "lib/" so the
+# sources are located correctly in both cases.
+prefix="${1%lib/*}"
+SRC="$PWD/$prefix"
 
-# Make the compiler and output paths absolute; the source files are passed to
-# nvc as absolute paths so that --relative can strip the execroot prefix and
-# store reproducible, relocatable paths in the libraries.
-case "$NVC" in /*) ;; *) NVC="$SRC/$NVC" ;; esac
-case "$OUT" in /*) ;; *) OUT="$SRC/$OUT" ;; esac
+# Make the compiler and output paths absolute (relative to the execroot); the
+# source files are passed to nvc as absolute paths so that --relative can strip
+# the prefix and store reproducible, relocatable paths in the libraries.
+case "$NVC" in /*) ;; *) NVC="$PWD/$NVC" ;; esac
+case "$OUT" in /*) ;; *) OUT="$PWD/$OUT" ;; esac
 
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
