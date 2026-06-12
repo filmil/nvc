@@ -1,0 +1,29 @@
+"""NVC - VHDL compiler and simulator.
+
+A native Bazel build that does not use rules_foreign_cc.  Only modules that
+are available on the Bazel Central Registry are used.  The LLVM code generator
+is disabled; NVC's built-in interpreter and x86-64 JIT back end are used
+instead, which keeps the dependency set small and entirely BCR-hosted.
+"""
+
+module(
+    name = "nvc",
+    version = "1.22.0",
+)
+
+# Core rule sets and helpers.
+bazel_dep(name = "rules_cc", version = "0.2.19")
+bazel_dep(name = "platforms", version = "1.1.0")
+bazel_dep(name = "bazel_skylib", version = "1.9.0")
+
+# Native, hermetic flex toolchain for the lexer (built from source via
+# rules_m4 -- no rules_foreign_cc involved).
+bazel_dep(name = "rules_flex", version = "0.4.1")
+
+# Used only for the convenience `bazel run //:nvc_cmd` launcher.
+bazel_dep(name = "rules_shell", version = "0.8.0")
+
+# Third party C libraries linked into nvc.
+bazel_dep(name = "zlib", version = "1.3.2")
+bazel_dep(name = "zstd", version = "1.5.7.bcr.1")
+bazel_dep(name = "libffi", version = "3.4.7.bcr.4")

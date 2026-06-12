@@ -1,0 +1,9 @@
+# NVC native Bazel build configuration.
+#
+# The build is intentionally plain: bzlmod is the default in Bazel 9, the nvc
+# executable links dynamically (required so the JIT's foreign-function
+# interface can resolve the runtime support symbols exported with -rdynamic),
+# and no special toolchain flags are needed.
+
+# Keep test output readable when/if tests are added.
+test --test_output=errors
