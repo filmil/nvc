@@ -1,4 +1,11 @@
 build/
+# Bazel
+/bazel-bin
+/bazel-out
+/bazel-testlogs
+/bazel-nvc
+/bazel-*
+MODULE.bazel.lock
 Makefile.in
 /INSTALL
 /aclocal.m4
